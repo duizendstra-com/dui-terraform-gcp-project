@@ -23,10 +23,18 @@ resource "google_project" "main" {
 }
 
 resource "google_project_service" "project_services" {
-  for_each           = toset(var.apis)
+  for_each           = { for api in var.apis : api.service => api }
   project            = google_project.main.project_id
   service            = each.key
   disable_on_destroy = false
 
   depends_on = [google_project.main]
+}
+
+resource "google_service_account" "service_accounts" {
+  for_each = { for api in var.apis : api.service => api if api.create_service_account }
+
+  account_id   = "${split(".", each.value.service)[0]}-sa"
+  display_name = "Service account for ${split(".", each.value.service)[0]}"
+  project      = google_project.main.project_id
 }

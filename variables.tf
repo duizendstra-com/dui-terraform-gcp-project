@@ -19,8 +19,10 @@ variable "billing_account" {
 }
 
 variable "apis" {
-  description = "List of APIs to enable"
-  type        = list(string)
-  default = [
-  ]
+  description = "List of APIs to enable and whether to create a service account for each"
+  type = list(object({
+    service                = string
+    create_service_account = bool
+  }))
+  default = []
 }
